@@ -28,11 +28,18 @@ const userSchema = mongoose.Schema({
     profilePhoto: String,
     password: {
         type: String,
-        required: true
+        required: true,
+        select:false
     },
     cnfrmPassword: {
         type: String,
-        required: true
+        required: true,
+        validate : {
+            validator: function (el) {
+                return this.password === el;
+            },
+            message: "Passwords does not match"
+        },
     },
     designation: {
         type: String,
