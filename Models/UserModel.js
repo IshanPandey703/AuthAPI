@@ -5,6 +5,10 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    UserId: {
+        type: String,
+        required: true
+    },
     rollNum: {
         type: String,
         required: true
