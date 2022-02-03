@@ -3,9 +3,9 @@ const jwt = require("jsonwebtoken");
 
 const signToken = (id) => {
   // instead use process.env.JWT_SECRET
-  return jwt.sign({ id }, "ajoiadjfiadjfi", {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
     // instead use process.env.JWT_COOKIE_EXPIRES_IN
-    expiresIn: 1000000,
+    expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 

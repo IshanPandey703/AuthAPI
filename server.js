@@ -4,7 +4,6 @@ const app = express();
 const mongoose = require("mongoose");
 
 dotenv.config();
-
 mongoose.connect(`mongodb+srv://${process.env.MONGODB_USERNAME}:
 ${process.env.MONGODB_PASSWORD}@napsuserdb.n9gvp.mongodb.net/NapsUserDB
 ?retryWrites=true&w=majority`,{
