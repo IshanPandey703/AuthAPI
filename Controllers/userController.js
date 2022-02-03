@@ -53,11 +53,26 @@ exports.UpdateUser = async (req, res, next) => {
   ExistingUser.rollNum = rollNum
   ExistingUser.profilePhoto = profilePhoto
   try{
-      await User.save();
+      await ExistingUser.save();
   }catch(err){
     next(new Error('User could not be updated!!'))
   }
   res.status(200).json({"Message":"User updated successfully",ExistingUser});
 }
 
+exports.DeleteUser = async(req,res,next) => {
+  const {userId} = req.body;
+  let ExistingUser
+  try {
+    ExistingUser = await User.findOne({ UserId: userId })
+  } catch (err) {
+    next(new Error('User not found!!'))
+  }
+  try {
+    await ExistingUser.remove();
+  } catch (err) {
+    next(new Error('User deletion failed!!'))
+  }
+  res.status(200).json({"Message":"User Deleted successfully",ExistingUser});
+}
 
