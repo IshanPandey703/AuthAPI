@@ -4,7 +4,6 @@ const apiFeature = require("./../utils/APIFeatures");
 const apiFeatures = require("./../utils/APIFeatures");
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    // instead use process.env.JWT_COOKIE_EXPIRES_IN
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
@@ -13,10 +12,9 @@ const createSendToken = (user, statusCode = 200, res) => {
   const token = signToken(user._id);
   const cookieOptions = {
     expires: new Date(
-      // use process.env.JWT_COOKIE_EXPIRES_IN
       Date.now() + process.env.JWT_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    httpOnly: true, // what is this line ?
+    httpOnly: true, 
   };
   res.cookie("jwt", token, cookieOptions);
   res.status(statusCode).json({
