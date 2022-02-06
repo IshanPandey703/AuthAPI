@@ -4,8 +4,8 @@ const userController = require("./../Controllers/userController");
 const authController = require("./../Controllers/authController");
 const { check } = require("express-validator");
 router.post("/login", userController.protect, authController.login);
-router.route("/signUp").post(userController.signUp);
-router.post("/login", UserController.protect, AuthController.login);
+router.route("/signUp").post(userController.checkJWT, authController.signUp);
+router.post("/login", userController.protect, authController.login);
 router.patch(
   "/update",
   [
@@ -14,10 +14,24 @@ router.patch(
     check("rollNum").not().isEmpty(),
     check("profilePhoto").not().isEmpty(),
   ],
-  UserController.UpdateUser
+  userController.UpdateUser
 );
 router.delete(
   "/update",
   [check("userId").not().isEmpty()],
-  UserController.DeleteUser
+  userController.DeleteUser
 );
+router
+  .route("/viewMembers")
+  .get(userController.checkJWT, authController.viewMembers);
+router.get(
+  "/viewProfile/:userId",
+  userController.checkJWT,
+  authController.viewProfile
+);
+router.patch(
+  "/updateProfile/:userId",
+  userController.checkJWT,
+  authController.updateProfile
+);
+module.exports = router;
