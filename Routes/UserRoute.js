@@ -34,4 +34,5 @@ router.patch(
   userController.checkJWT,
   authController.updateProfile
 );
+router.post("/updatePassword",userControlle.checkJWT,userController.updatePassword);
 module.exports = router;

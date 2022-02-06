@@ -2,6 +2,8 @@ const User = require("../Models/UserModel");
 const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
+const bcrypt = require("bcrypt");
+
 exports.protect = async (req, res, next) => {
   const user = await User.findOne({ rollNum: req.body.rollNum }).select(
     "+password"
@@ -82,4 +84,11 @@ exports.DeleteUser = async (req, res, next) => {
     next(new Error("User deletion failed!!"));
   }
   res.status(200).json({ Message: "User Deleted successfully", ExistingUser });
+};
+
+exports.updatePassword = async(req,res,next)=>{
+  const newPassword = await bcrypt.hash(req.body.password,12);
+  const filter = {rollNum: req.body.UserName};
+  const update = {password: `${newPassword}`};
+  await User.findOneAndUpdate(filter,update);
 };
