@@ -3,22 +3,22 @@ const router = express.Router();
 const userController = require("./../Controllers/userController");
 const authController = require("./../Controllers/authController");
 const { check } = require("express-validator");
-router.post("/login", userController.protect, authController.login);
 router.route("/signUp").post(userController.checkJWT, authController.signUp);
 router.post("/login", userController.protect, authController.login);
 router.patch(
   "/update",
+  userController.checkJWT,
   [
-    check("userId").not().isEmpty(),
-    check("Name").not().isEmpty(),
+    check("name").not().isEmpty(),
     check("rollNum").not().isEmpty(),
     check("profilePhoto").not().isEmpty(),
+    check("email").not().isEmpty(),
   ],
   userController.UpdateUser
 );
 router.delete(
-  "/update",
-  [check("userId").not().isEmpty()],
+  "/delete/:id",
+  userController.checkJWT,
   userController.DeleteUser
 );
 router

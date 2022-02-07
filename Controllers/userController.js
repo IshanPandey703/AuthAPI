@@ -4,6 +4,16 @@ const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 
+const filterObj = (updateObj, filter) => {
+  const objkeys = Object.keys(updateObj);
+  objkeys.forEach((el) => {
+    if (!filter.includes(el)) {
+      delete updateObj[el];
+    }
+  })
+  return updateObj;
+}
+
 exports.protect = async (req, res, next) => {
   const user = await User.findOne({ rollNum: req.body.rollNum }).select(
     "+password"
@@ -11,6 +21,12 @@ exports.protect = async (req, res, next) => {
   if (!user) {
     return res.status(400).json({
       message: "Either UserName or Password Wrong",
+    });
+  }
+  if(user.active===false){
+    return res.status(400).json({
+      status: "fail",
+      message: "User inactive, contact Admin"
     });
   }
   const compare = await user.correctPassword(req.body.password, user.password);
@@ -52,38 +68,41 @@ exports.checkJWT = async (req, res, next) => {
 };
 
 exports.UpdateUser = async (req, res, next) => {
-  const { userId, Name, rollNum, profilePhoto } = req.body;
-  let ExistingUser;
-  try {
-    ExistingUser = await User.findOne({ UserId: userId });
-  } catch (err) {
-    next(new Error("User not found!!"));
+  const updateObj = {...req.body};
+  const filteredObj = filterObj(updateObj,["name","profilePhoto","email","rollNum"]);
+  const ExistingUser = await User.findById(req._id);
+  if(!ExistingUser){
+    return res.status(400).json({
+      "status": "fail",
+      "message": "User does not exist"
+    });
   }
-  ExistingUser.name = Name;
-  ExistingUser.rollNum = rollNum;
-  ExistingUser.profilePhoto = profilePhoto;
-  try {
-    await ExistingUser.save();
-  } catch (err) {
-    next(new Error("User could not be updated!!"));
-  }
-  res.status(200).json({ Message: "User updated successfully", ExistingUser });
+  ExistingUser.name = filteredObj.name;
+  ExistingUser.rollNum = filteredObj.rollNum;
+  ExistingUser.profilePhoto = filteredObj.profilePhoto;
+  ExistingUser.email = filteredObj.email;
+  await ExistingUser.save();
+  res.status(200).json({"status": "Success" ,"message": "User updated", ExistingUser });
 };
 
 exports.DeleteUser = async (req, res, next) => {
-  const { userId } = req.body;
-  let ExistingUser;
-  try {
-    ExistingUser = await User.findOne({ UserId: userId });
-  } catch (err) {
-    next(new Error("User not found!!"));
+  const ExistingUser = await User.findById(req.params.id);
+  if(!ExistingUser){
+    return res.status(400).json({
+      "status": "fail",
+      "message": "User not found"
+    });
   }
-  try {
-    await ExistingUser.remove();
-  } catch (err) {
-    next(new Error("User deletion failed!!"));
+  const curUser = await User.findById(req._id);
+  if(curUser.role==="owner"||String(curUser._id)===String(ExistingUser._id)){
+    await User.findOneAndUpdate({_id:String(ExistingUser._id)},{active:false});
+  } else {
+    return res.status(400).json({
+      "status": "fail",
+      "message": "You are not authorized to perform this action"
+    });
   }
-  res.status(200).json({ Message: "User Deleted successfully", ExistingUser });
+  return res.status(200).json({ "status": "Success","message": "User Deleted"});
 };
 
 exports.updatePassword = async (req, res, next) => {
