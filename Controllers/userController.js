@@ -86,9 +86,28 @@ exports.DeleteUser = async (req, res, next) => {
   res.status(200).json({ Message: "User Deleted successfully", ExistingUser });
 };
 
-exports.updatePassword = async(req,res,next)=>{
-  const newPassword = await bcrypt.hash(req.body.password,12);
-  const filter = {rollNum: req.body.UserName};
-  const update = {password: `${newPassword}`};
-  await User.findOneAndUpdate(filter,update);
+exports.updatePassword = async (req, res, next) => {
+  const user = await User.findById(req._id).select("+password");
+  if (!req.body.currentPassword)
+    return res.status(400).json({
+      status: "fail",
+      message: "Please provide the current password",
+    });
+  if (!(await user.correctPassword(req.body.currentPassword, user.password)))
+    return res.status(400).json({
+      status: "fail",
+      message: "Invalid current Password",
+    });
+  if (!(await bcrypt.compare(req.body.password, user.password)))
+    return res.status(400).json({
+      status: "fail",
+      message: "New password shall not be same as the old one",
+    });
+  user.password = req.body.password;
+  user.cnfrmPassword = req.body.cnfrmPassword;
+  const status = await user.save({ validateBeforeSave: true });
+  res.status(201).json({
+    status: "success",
+    message: "Password Changed",
+  });
 };
