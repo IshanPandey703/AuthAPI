@@ -27,7 +27,10 @@ const userSchema = mongoose.Schema({
       message: 'Invalid mail Id'
     }
   },
-  isActive: true,
+  isActive: {
+    type: Boolean,
+    required: [true,"Account activity not set!"]
+  },
   rollNum: {
     type: String,
     required: [true, 'Kindly, provide the roll number'],

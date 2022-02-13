@@ -1,7 +1,6 @@
 const User = require('../Models/UserModel')
 const { promisify } = require('util')
 const jwt = require('jsonwebtoken')
-const { validationResult } = require('express-validator')
 const bcrypt = require('bcrypt')
 
 exports.protect = async (req, res, next) => {
