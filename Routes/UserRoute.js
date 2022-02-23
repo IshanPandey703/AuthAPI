@@ -15,28 +15,33 @@ router.patch(
     check("email").not().isEmpty(),
   ],
   userController.UpdateUser
-);
+)
+router.patch(
+  '/deactivate',
+  userController.checkJWT,
+  userController.DeactivateUser
+)
 router.delete(
   "/delete/:id",
   userController.checkJWT,
   userController.DeleteUser
-);
+)
 router
-  .route("/viewMembers")
-  .get(userController.checkJWT, authController.viewMembers);
+  .route('/viewMembers')
+  .get(userController.checkJWT, authController.viewMembers)
 router.get(
-  "/viewProfile/:userId",
+  '/viewProfile/:userId',
   userController.checkJWT,
   authController.viewProfile
-);
+)
 router.patch(
-  "/updateProfile/:userId",
+  '/updateProfile/:userId',
   userController.checkJWT,
   authController.updateProfile
-);
+)
 router.patch(
-  "/updatePassword",
+  '/updatePassword',
   userController.checkJWT,
   userController.updatePassword
-);
-module.exports = router;
+)
+module.exports = router
