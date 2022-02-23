@@ -36,15 +36,7 @@ const filterObj = (updateObj, filter) => {
   return updateObj;
 };
 exports.login = async (req, res, next) => {
-  try{
   const user = await User.findOne({ rollNum: req.body.rollNum });
-  }
-  catch(err){
-    next(new Error("Account does not exist!!"));
-  }
-  if( user.isActive === false ){
-    next(new Error("Account is deactivated!!"));
-  }
   createSendToken(user, 200, res);
 };
 exports.signUp = async (req, res, next) => {
