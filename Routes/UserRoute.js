@@ -1,40 +1,42 @@
-const express = require('express')
-const router = express.Router()
-const userController = require('./../Controllers/userController')
-const authController = require('./../Controllers/authController')
-router.post('/login', userController.protect, authController.login)
-router.route('/signUp').post(authController.signUp)
+const express = require("express");
+const router = express.Router();
+const userController = require("./../Controllers/userController");
+const authController = require("./../Controllers/authController");
+const { check } = require("express-validator");
+router.route("/signUp").post(userController.checkJWT, authController.signUp);
+router.post("/login", userController.protect, authController.login);
 router.patch(
-  '/update',
+  "/update",
   userController.checkJWT,
+  [
+    check("name").not().isEmpty(),
+    check("rollNum").not().isEmpty(),
+    check("profilePhoto").not().isEmpty(),
+    check("email").not().isEmpty(),
+  ],
   userController.UpdateUser
-)
-router.patch(
-  '/deactivate',
-  userController.checkJWT,
-  userController.DeactivateUser
-)
+);
 router.delete(
-  '/delete',
+  "/delete/:id",
   userController.checkJWT,
   userController.DeleteUser
-)
+);
 router
-  .route('/viewMembers')
-  .get(userController.checkJWT, authController.viewMembers)
+  .route("/viewMembers")
+  .get(userController.checkJWT, authController.viewMembers);
 router.get(
-  '/viewProfile/:userId',
+  "/viewProfile/:userId",
   userController.checkJWT,
   authController.viewProfile
-)
+);
 router.patch(
-  '/updateProfile/:userId',
+  "/updateProfile/:userId",
   userController.checkJWT,
   authController.updateProfile
-)
+);
 router.patch(
-  '/updatePassword',
+  "/updatePassword",
   userController.checkJWT,
   userController.updatePassword
-)
-module.exports = router
+);
+module.exports = router;
